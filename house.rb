@@ -15,9 +15,16 @@ module Commands
         converted_directions << direction_conversions[d]
       end
       puts "#{current_room.description}. From here you can go #{converted_directions.join(', ')}."
-    elsif
+    else
       # look at an object in the room (if it exists)
-      puts "Bla"
+      command.slice!("look ")
+      object = command.intern
+      if current_room.game_objects.key?(object)
+        object_instance = current_room.game_objects[object]
+        puts object_instance.description
+      else
+        puts "That object doesn't exist, at least not in this room."
+      end
     end
   end
 
@@ -33,7 +40,7 @@ end
 # Create the room class
 class Room
   attr_reader :name, :description
-  attr_accessor :directions
+  attr_accessor :directions, :game_objects
   def initialize(name,description,directions,game_objects)
     @name = name
     @description = description
@@ -66,8 +73,8 @@ def evaluate(command)
   if command == "q"
     puts "Bye, bye!"
     return
-  elsif command == "look"
-    look($current_room, "look")
+  elsif command == "look" || command.start_with?("look ")
+    look($current_room, command)
     prompt
   elsif command.start_with?("go")
     if command == "go"
@@ -96,21 +103,21 @@ end
 
 def create_objects
   $fork = GameObject.new("Fork", "This is a fork", "Action", true, true)
+  $bag = GameObject.new("Bag", "This is a bag", "Action", true, true)
 end
 
 # The rooms have to be created first with empty hashes for the directions
 # because not all instances are available when they are called in the hashes
 
 def create_rooms
-  $room1 = Room.new("Room 1", "This is room 1", {}, [$fork])
-  $room2 = Room.new("Room 2", "This is room 2", {}, [])
-  $room3 = Room.new("Room 3", "This is room 3", {}, [])
-  $room4 = Room.new("Room 4", "This is room 4", {}, [])
-  $room5 = Room.new("Room 5", "This is room 5", {}, [])
+  $room1 = Room.new("Room 1", "This is room 1", {}, {fork: $fork, bag: $bag})
+  $room2 = Room.new("Room 2", "This is room 2", {}, {})
+  $room3 = Room.new("Room 3", "This is room 3", {}, {})
+  $room4 = Room.new("Room 4", "This is room 4", {}, {})
+  $room5 = Room.new("Room 5", "This is room 5", {}, {})
 end
 
 # Setting the directions for the different rooms
-# THe hash creation should be updated to the newer Ruby syntax, but i'll leave it like this for now
 def set_directions
   $room1.directions = {e: $room2}
   $room2.directions = {w: $room1, n: $room3, e: $room4, s: $room5}
@@ -119,7 +126,8 @@ def set_directions
   $room5.directions = {n: $room2}
 end
 
-# Calling the methods to create the rooms and set the directions
+# Calling the methods to create the rooms and objects and set the directions
+create_objects
 create_rooms
 set_directions
 
