@@ -5,6 +5,8 @@
 # => Look at objects in Room
 
 module Commands
+
+  # The look method is for objects in a room or in your inventory
   def look(current_room, command)
     if command == "look"
       # look at the current room
@@ -22,6 +24,9 @@ module Commands
       if current_room.game_objects.key?(object)
         object_instance = current_room.game_objects[object]
         puts object_instance.description
+      elsif $inventory.key?(object)
+        object_instance = $inventory[object]
+        puts object_instance.description
       else
         puts "That object doesn't exist, at least not in this room."
       end
@@ -37,9 +42,8 @@ module Commands
       if current_room.game_objects.key?(object)
         object_instance = current_room.game_objects[object]
         if object_instance.pickup
-          $inventory << object_instance
+          $inventory[object] = current_room.game_objects.delete(object)
           puts "You add #{object_instance.name} to your inventory."
-          current_room.game_objects.delete(object)
         else
           puts "You can't pick that up."
         end
@@ -54,7 +58,7 @@ module Commands
       puts "Your inventory is empty."
     else
       inventory_list = []
-      $inventory.each do |i|
+      $inventory.each do |s,i|
         inventory_list << i.name
       end
       puts "In your inventory you has the following items: #{inventory_list.join(', ')}"
@@ -164,7 +168,7 @@ set_directions
 $current_room = $room1
 
 # Creating an empty inventory array
-$inventory = []
+$inventory = {}
 
 # Start the game by running the prompt
 prompt
