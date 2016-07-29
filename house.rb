@@ -28,9 +28,24 @@ module Commands
     end
   end
 
-  def go(current_room, direction)
-    $current_room = current_room.directions[direction]
-    prompt
+  def go(current_room, command)
+    if command == "go"
+      puts "Please specify a direction"
+      prompt
+    elsif command.start_with?("go ") && command.length == 4
+      direction = command.slice(3).intern
+      # Check if the entered direction is an actual direction
+      if $current_room.directions.key?(direction)
+        $current_room = current_room.directions[direction]
+      else
+        puts "You can't go that way"
+        prompt
+      end
+    elsif command.start_with?("go ")
+      command.slice!("go ")
+      puts "I don't understand the direction #{command}"
+      prompt
+    end
   end
 
   def get(current_room, object_name)
@@ -77,23 +92,8 @@ def evaluate(command)
     look($current_room, command)
     prompt
   elsif command.start_with?("go")
-    if command == "go"
-      puts "Please specify a direction"
-      prompt
-    elsif command.start_with?("go ") && command.length == 4
-      direction = command.slice(3).intern
-      # Check if the entered direction is an actual direction
-      if $current_room.directions.key?(direction)
-        go($current_room, direction)
-      else
-        puts "You can't go that way"
-        prompt
-      end
-    elsif command.start_with?("go ")
-      command.slice!("go ")
-      puts "I don't understand the direction #{command}"
-      prompt
-    end
+    go($current_room, command)
+    prompt
   else
     puts "I don't understand #{command}"
     prompt
