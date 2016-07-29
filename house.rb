@@ -11,7 +11,7 @@ module Commands
       # convert the availavle direcions into the proper text
       converted_directions = []
       current_room.directions.each do |d,r|
-        direction_conversions = {n: "North", s:"South", e: "East", w: "West"}
+        direction_conversions = {n: "North", s: "South", e: "East", w: "West"}
         converted_directions << direction_conversions[d]
       end
       puts "#{current_room.description}. From here you can go #{converted_directions.join(', ')}."
@@ -25,6 +25,39 @@ module Commands
       else
         puts "That object doesn't exist, at least not in this room."
       end
+    end
+  end
+
+  def get(current_room, command)
+    if command == "get"
+      puts "I don't get it, what do you want?"
+    else
+      command.slice!("get ")
+      object = command.intern
+      if current_room.game_objects.key?(object)
+        object_instance = current_room.game_objects[object]
+        if object_instance.pickup
+          $inventory << object_instance
+          puts "You add #{object_instance.name} to your inventory."
+          current_room.game_objects.delete(object)
+        else
+          puts "You can't pick that up."
+        end
+      else
+        puts "You can't get that, at least not now."
+      end
+    end
+  end
+
+  def inventory
+    if $inventory.empty?
+      puts "Your inventory is empty."
+    else
+      inventory_list = []
+      $inventory.each do |i|
+        inventory_list << i.name
+      end
+      puts "In your inventory you has the following items: #{inventory_list.join(', ')}"
     end
   end
 
@@ -44,14 +77,6 @@ module Commands
       puts "I don't understand the direction #{command}"
     end
   end
-
-  def get(current_room, command)
-    if command == "get"
-      puts "I don't get it, what do you want?"
-    else
-      puts "You can't get that, at least not now."
-    end
-  end
 end
 
 # Create the room class
@@ -68,7 +93,7 @@ end
 
 # Create the object class for all objects in the game
 class GameObject
-  attr_reader :name, :description, :action
+  attr_reader :name, :description, :action, :pickup
   def initialize(name,description,action,pickup,visible)
     @name = name
     @description = description
@@ -92,10 +117,12 @@ def evaluate(command)
     return
   elsif command == "look" || command.start_with?("look ")
     look($current_room, command)
-  elsif command.start_with?("go")
+  elsif command == "go" || command.start_with?("go ")
     go($current_room, command)
-  elsif command.start_with?("get")
+  elsif command == "get" || command.start_with?("get ")
     get($current_room, command)
+  elsif command == "inventory"
+    inventory
   else
     puts "I don't understand #{command}"
   end
@@ -105,7 +132,7 @@ end
 
 def create_objects
   $fork = GameObject.new("Fork", "This is a fork", "Action", true, true)
-  $bag = GameObject.new("Bag", "This is a bag", "Action", true, true)
+  $bag = GameObject.new("Bag", "This is a bag", "Action", false, true)
 end
 
 # The rooms have to be created first with empty hashes for the directions
