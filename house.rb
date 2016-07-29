@@ -31,7 +31,6 @@ module Commands
   def go(current_room, command)
     if command == "go"
       puts "Please specify a direction"
-      prompt
     elsif command.start_with?("go ") && command.length == 4
       direction = command.slice(3).intern
       # Check if the entered direction is an actual direction
@@ -39,16 +38,19 @@ module Commands
         $current_room = current_room.directions[direction]
       else
         puts "You can't go that way"
-        prompt
       end
     elsif command.start_with?("go ")
       command.slice!("go ")
       puts "I don't understand the direction #{command}"
-      prompt
     end
   end
 
-  def get(current_room, object_name)
+  def get(current_room, command)
+    if command == "get"
+      puts "I don't get it, what do you want?"
+    else
+      puts "You can't get that, at least not now."
+    end
   end
 end
 
@@ -90,14 +92,14 @@ def evaluate(command)
     return
   elsif command == "look" || command.start_with?("look ")
     look($current_room, command)
-    prompt
   elsif command.start_with?("go")
     go($current_room, command)
-    prompt
+  elsif command.start_with?("get")
+    get($current_room, command)
   else
     puts "I don't understand #{command}"
-    prompt
   end
+  prompt
 end
 
 
@@ -133,6 +135,9 @@ set_directions
 
 # Define the first room the game starts in
 $current_room = $room1
+
+# Creating an empty inventory array
+$inventory = []
 
 # Start the game by running the prompt
 prompt
