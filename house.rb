@@ -53,6 +53,28 @@ module Commands
     end
   end
 
+  def use(command)
+    if command == "use"
+      puts "Use what?"
+    else
+      command.slice!("use ")
+      objects = command.split(" on ")
+      object1 = objects[0].intern
+      object2 = objects[1].intern
+      if $inventory.key?(object1) && $inventory.key?(object2)
+        object1_instance = $inventory[object1]
+        puts object1_instance.action[:text]
+        # new_object = object1_instance.action[:result]
+        # new_object_key = new_object.to_s.intern
+        # $inventory.delete(object1)
+        # $inventory.delete(object2)
+        # $inventory[new_object_key] = new_object
+      else
+        puts "That doesn't make sense"
+      end
+    end
+  end
+
   def inventory
     if $inventory.empty?
       puts "Your inventory is empty."
@@ -125,8 +147,10 @@ def evaluate(command)
     go($current_room, command)
   elsif command == "get" || command.start_with?("get ")
     get($current_room, command)
-  elsif command == "inventory"
+  elsif command == "inventory" || command == "i"
     inventory
+  elsif command == "use" || command.start_with?("use ")
+    use(command)
   else
     puts "I don't understand #{command}"
   end
@@ -135,15 +159,20 @@ end
 
 
 def create_objects
-  $fork = GameObject.new("Fork", "This is a fork", "Action", true, true)
-  $bag = GameObject.new("Bag", "This is a bag", "Action", false, true)
+  $fork = GameObject.new("Fork", "This is a fork", {verb: "combine", combine: "balloon", text: "Using the fork on the balloon, does the obvious thing. You get a deflated balloon with a hole in it.", result: $punched_balloon}, true, true)
+  $bag = GameObject.new("Bag", "This is a bag", {}, false, true)
+  $balloon = GameObject.new("Balloon", "This is an inflated balloon", {}, true, true)
+  $punched_balloon = GameObject.new("Punched balloon", "It's a deflated balloon with a tiny hole in it", {}, false, false)
+end
+
+def punched_balloon
 end
 
 # The rooms have to be created first with empty hashes for the directions
 # because not all instances are available when they are called in the hashes
 
 def create_rooms
-  $room1 = Room.new("Room 1", "This is room 1", {}, {fork: $fork, bag: $bag})
+  $room1 = Room.new("Room 1", "This is room 1", {}, {fork: $fork, bag: $bag, balloon: $balloon})
   $room2 = Room.new("Room 2", "This is room 2", {}, {})
   $room3 = Room.new("Room 3", "This is room 3", {}, {})
   $room4 = Room.new("Room 4", "This is room 4", {}, {})
