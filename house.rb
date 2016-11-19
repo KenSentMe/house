@@ -20,7 +20,7 @@ module Commands
     else
       # look at an object in the room (if it exists)
       command.slice!("look ")
-      object = command.intern
+      object = command.gsub(" ","_").intern
       if current_room.game_objects.key?(object)
         object_instance = current_room.game_objects[object]
         puts object_instance.description
@@ -64,11 +64,16 @@ module Commands
       if $inventory.key?(object1) && $inventory.key?(object2)
         object1_instance = $inventory[object1]
         puts object1_instance.action[:text]
-        # new_object = object1_instance.action[:result]
-        # new_object_key = new_object.to_s.intern
-        # $inventory.delete(object1)
-        # $inventory.delete(object2)
-        # $inventory[new_object_key] = new_object
+        result = object1_instance.action[:result]
+        new_object_key = result[:key]
+        new_object_var = result[:object]
+        puts new_object_key.class
+        puts new_object_var.class
+        # new_object_var = $punched_balloon
+        puts result[:text]
+        $inventory[new_object_key] = object1_instance.action[:result_object]
+        $inventory.delete(object1)
+        $inventory.delete(object2)
       else
         puts "That doesn't make sense"
       end
@@ -157,9 +162,8 @@ def evaluate(command)
   prompt
 end
 
-
 def create_objects
-  $fork = GameObject.new("Fork", "This is a fork", {verb: "combine", combine: "balloon", text: "Using the fork on the balloon, does the obvious thing. You get a deflated balloon with a hole in it.", result: $punched_balloon}, true, true)
+  $fork = GameObject.new("Fork", "This is a fork", {verb: "combine", combine: "balloon", text: "Using the fork on the balloon, does the obvious thing. You get a deflated balloon with a hole in it.", result: {key: :punched_balloon, object: $punched_balloon, text: "Punched balloon"}, result_object: $punched_balloon}, true, true)
   $bag = GameObject.new("Bag", "This is a bag", {}, false, true)
   $balloon = GameObject.new("Balloon", "This is an inflated balloon", {}, true, true)
   $punched_balloon = GameObject.new("Punched balloon", "It's a deflated balloon with a tiny hole in it", {}, false, false)
