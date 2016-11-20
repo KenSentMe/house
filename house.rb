@@ -13,26 +13,33 @@ def prompt
   include Commands
   print "[#{$current_room.name}]:>"
   command = gets.chomp.downcase
-  evaluate(command)
+  # split the command so we have seperate word and params
+  command = command.split(' ')
+  # grab the first word and define it as the word of the command
+  command_word = command.shift
+  # and the rest of the command is one or more parameters
+  command_params = command
+  evaluate(command_word, command_params)
 end
 
 # Here the commands are evaluated and (if necessary) sent to the appropriate method
-def evaluate(command)
-  if command == "q"
+def evaluate(command_word, command_params)
+  case command_word
+  when "q", "quit"
     puts "Bye, bye!"
     return
-  elsif command == "look" || command.start_with?("look ")
-    look($current_room, command)
-  elsif command == "go" || command.start_with?("go ")
-    go($current_room, command)
-  elsif command == "get" || command.start_with?("get ")
-    get($current_room, command)
-  elsif command == "inventory" || command == "i"
+  when "look"
+    look($current_room, command_params)
+  when "go"
+    go($current_room, command_params)
+  when "get"
+    get($current_room, command_params)
+  when "i", "inventory"
     inventory
-  elsif command == "use" || command.start_with?("use ")
-    use(command)
+  when "use"
+    use(command_params)
   else
-    puts "I don't understand #{command}"
+    puts "I don't understand #{command_params}"
   end
   prompt
 end

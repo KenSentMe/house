@@ -1,8 +1,8 @@
 module Commands
 
   # The look method is for objects in a room or in your inventory
-  def look(current_room, command)
-    if command == "look"
+  def look(current_room, command_params)
+    if command_params.empty?
       # look at the current room
       # convert the availavle direcions into the proper text
       converted_directions = []
@@ -13,8 +13,7 @@ module Commands
       puts "#{current_room.description}. From here you can go #{converted_directions.join(', ')}."
     else
       # look at an object in the room (if it exists)
-      command.slice!("look ")
-      object = command.gsub(" ","_").intern
+      object = command_params.join('_').intern
       if current_room.game_objects.key?(object)
         object_instance = current_room.game_objects[object]
         puts object_instance.description
@@ -27,12 +26,13 @@ module Commands
     end
   end
 
-  def get(current_room, command)
-    if command == "get"
+  def get(current_room, command_params)
+    if command_params.empty?
       puts "I don't get it, what do you want?"
+    elsif command_params.length > 1
+      puts "Wow, easy there. Try picking up one item at a time."
     else
-      command.slice!("get ")
-      object = command.intern
+      object = command_params[0].intern
       if current_room.game_objects.key?(object)
         object_instance = current_room.game_objects[object]
         if object_instance.pickup
@@ -48,14 +48,17 @@ module Commands
   end
 
   # The use command is for combining objects.
-  def use(command)
-    if command == "use"
+  def use(command_params)
+    if command_params.empty?
       puts "Use what?"
+    elsif command_params.length > 3
+      puts "What are you trying to do, make a coctail? Combining two items should be sufficient."
+    elsif command_params[1] != "on"
+      puts "That's not the right way to combine stuff"
     else
-      command.slice!("use ")
-      objects = command.split(" on ")
-      object1 = objects[0].intern
-      object2 = objects[1].intern
+      command_params.delete("on")
+      object1 = command_params[0].intern
+      object2 = command_params[1].intern
       if $inventory.key?(object1) && $inventory.key?(object2)
         object1_instance = $inventory[object1]
         puts object1_instance.action[:text]
@@ -83,20 +86,20 @@ module Commands
     end
   end
 
-  def go(current_room, command)
-    if command == "go"
+  def go(current_room, command_params)
+    if command_params.empty?
       puts "Please specify a direction"
-    elsif command.start_with?("go ") && command.length == 4
-      direction = command.slice(3).intern
+    elsif command_params.length == 1 || command_params[1].length == 1
+      direction = command_params[0].intern
       # Check if the entered direction is an actual direction
       if $current_room.directions.key?(direction)
         $current_room = current_room.directions[direction]
       else
         puts "You can't go that way"
       end
-    elsif command.start_with?("go ")
-      command.slice!("go ")
-      puts "I don't understand the direction #{command}"
+    else
+      wrong_direction = command_params.join(" ")
+      puts "I don't understand the direction #{wrong_direction}"
     end
   end
 end
