@@ -65,13 +65,9 @@ module Commands
         object1_instance = $inventory[object1]
         puts object1_instance.action[:text]
         result = object1_instance.action[:result]
-        new_object_key = result[:key]
-        new_object_var = result[:object]
-        puts new_object_key.class
-        puts new_object_var.class
-        # new_object_var = $punched_balloon
-        puts result[:text]
-        $inventory[new_object_key] = object1_instance.action[:result_object]
+        created_object_key = result[:key]
+        created_object = result[:object]
+        $inventory[created_object_key] = created_object
         $inventory.delete(object1)
         $inventory.delete(object2)
       else
@@ -124,7 +120,8 @@ end
 
 # Create the object class for all objects in the game
 class GameObject
-  attr_reader :name, :description, :action, :pickup
+  attr_reader :name, :description, :pickup
+  attr_accessor :action
   def initialize(name,description,action,pickup,visible)
     @name = name
     @description = description
@@ -163,10 +160,15 @@ def evaluate(command)
 end
 
 def create_objects
-  $fork = GameObject.new("Fork", "This is a fork", {verb: "combine", combine: "balloon", text: "Using the fork on the balloon, does the obvious thing. You get a deflated balloon with a hole in it.", result: {key: :punched_balloon, object: $punched_balloon, text: "Punched balloon"}, result_object: $punched_balloon}, true, true)
+  $fork = GameObject.new("Fork", "This is a fork", {}, true, true)
   $bag = GameObject.new("Bag", "This is a bag", {}, false, true)
   $balloon = GameObject.new("Balloon", "This is an inflated balloon", {}, true, true)
   $punched_balloon = GameObject.new("Punched balloon", "It's a deflated balloon with a tiny hole in it", {}, false, false)
+  create_object_actions
+end
+
+def create_object_actions
+  $fork.action = {verb: "combine", combine: "balloon", text: "Using the fork on the balloon, does the obvious thing. You get a deflated balloon with a hole in it.", result: {key: :punched_balloon, object: $punched_balloon, text: "Punched balloon"}}
 end
 
 def punched_balloon
