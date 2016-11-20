@@ -53,6 +53,7 @@ module Commands
     end
   end
 
+  # The use command is for combining objects. 
   def use(command)
     if command == "use"
       puts "Use what?"
@@ -169,9 +170,6 @@ end
 
 def create_object_actions
   $fork.action = {verb: "combine", combine: "balloon", text: "Using the fork on the balloon, does the obvious thing. You get a deflated balloon with a hole in it.", result: {key: :punched_balloon, object: $punched_balloon, text: "Punched balloon"}}
-end
-
-def punched_balloon
 end
 
 # The rooms have to be created first with empty hashes for the directions
