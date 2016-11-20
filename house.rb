@@ -4,7 +4,7 @@
 # => Go to other room in certain direction
 # => Look at objects in Room
 
-require "./house_gameobjects.rb"
+require "./house_game_objects.rb"
 
 module Commands
 
