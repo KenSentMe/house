@@ -48,7 +48,7 @@ module Commands
   end
 
   # The use command is for combining objects.
-  def use(command_params)
+  def use(current_room, command_params)
     if command_params.empty?
       puts "Use what?"
     elsif command_params.length > 3
@@ -59,15 +59,33 @@ module Commands
       command_params.delete("on")
       object1 = command_params[0].intern
       object2 = command_params[1].intern
+
+      # first check of the two objects are in the inventory
       if $inventory.key?(object1) && $inventory.key?(object2)
+        # then create an instance of the first object
         object1_instance = $inventory[object1]
-        puts object1_instance.action[:text]
-        result = object1_instance.action[:result]
-        created_object_key = result[:key]
-        created_object = result[:object]
-        $inventory[created_object_key] = created_object
-        $inventory.delete(object1)
-        $inventory.delete(object2)
+        # check if it can be combined with the second object
+        if object1_instance.action[:combine_with] != object2.to_s
+          puts "You can't do that, at least not now."
+        else
+          # print out the result of the combination
+          puts object1_instance.action[:text]
+          new_object_key = object1_instance.action[:result]
+          $inventory[new_object_key] = object1_instance.action[:new_object]
+          $inventory.delete(object1)
+          $inventory.delete(object2)
+        end
+      # now check if the first object is in the inventory and the second is in the current room
+      elsif $inventory.key?(object1) && current_room.game_objects.key?(object2)
+        # then create an instance of the first object
+        object1_instance = $inventory[object1]
+        # check if the first object can be combined with the second object
+        if object1_instance.action[:combine_with] != object2.to_s
+          puts "You can't do that, at least not now."
+        else
+          # print out the result of the combination
+          puts object1_instance.action[:text]
+        end
       else
         puts "That doesn't make sense"
       end

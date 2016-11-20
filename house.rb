@@ -37,7 +37,7 @@ def evaluate(command_word, command_params)
   when "i", "inventory"
     inventory
   when "use"
-    use(command_params)
+    use($current_room, command_params)
   else
     puts "I don't understand #{command_params}"
   end
@@ -46,6 +46,7 @@ end
 
 # Calling the methods to create the rooms and objects and set the directions
 create_objects
+create_object_actions
 create_rooms
 set_directions
 
