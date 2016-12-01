@@ -65,15 +65,18 @@ module Commands
         # then create an instance of the first object
         object1_instance = $inventory[object1]
         # check if it can be combined with the second object
-        if object1_instance.action[:combine_with] != object2.to_s
+        if object1_instance.action[:use_with] != object2.to_s
           puts "You can't do that, at least not now."
         else
           # print out the result of the combination
           puts object1_instance.action[:text]
           new_object_key = object1_instance.action[:result]
-          $inventory[new_object_key] = object1_instance.action[:new_object]
-          $inventory.delete(object1)
-          $inventory.delete(object2)
+          object1_instance.action[:deleted_objects].each do |d|
+            $inventory.delete(d)
+          end
+          object1_instance.action[:created_objects].each do |c|
+            $inventory[new_object_key] = c
+          end
         end
       # now check if the first object is in the inventory and the second is in the current room
       elsif $inventory.key?(object1) && current_room.game_objects.key?(object2)

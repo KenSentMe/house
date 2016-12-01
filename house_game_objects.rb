@@ -59,17 +59,25 @@ end
 # Because the action hash may contain objects that aren't initialized when the object instances are created, the actions are defined seperately.
 def create_object_actions
   $fork.action = {
-    verb: "combine",
-    combine_with: "balloon",
+    verb: "use",
+    use_with: "balloon",
     text: "Using the fork on the balloon does the obvious thing. You get a deflated balloon with a hole in it.",
     result: :punched_balloon,
-    new_object: $punched_balloon
+    created_objects: [$punched_balloon],
+    deleted_objects: [:fork, :balloon]
   }
   $key.action = {
-    verb: "open",
+    verb: "alter",
     combine_with: "chest",
     text: "You use the key to open the chest.",
     altered_object: $chest,
-    altered_description: "The chest is now open. Too bad it's completely empty."
+    altered_description: "Since you've used the key to open the padlock, you can now open the chest.",
+    altered_text: "Inside the chest you find"
+  }
+  $chest.action = {
+    verb: "open",
+    state: "locked",
+    text: "The chest is locked.",
+    contains: [$ball, $typewriter]
   }
 end
