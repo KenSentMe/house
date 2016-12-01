@@ -10,7 +10,11 @@ module Commands
         direction_conversions = {n: "North", s: "South", e: "East", w: "West"}
         converted_directions << direction_conversions[d]
       end
-      puts "#{current_room.description}. From here you can go #{converted_directions.join(', ')}."
+      room_objects = []
+      current_room.game_objects.each do |k,o|
+        room_objects << o.room_text
+      end
+      puts "#{current_room.description}. #{room_objects.join(' ')} From here you can go #{converted_directions.join(', ')}."
     else
       # look at an object in the room (if it exists)
       object = command_params.join('_').intern

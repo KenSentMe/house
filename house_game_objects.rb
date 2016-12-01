@@ -1,10 +1,11 @@
 # Create the object class for all objects in the game
 class GameObject
-  attr_reader :name, :description, :pickup
+  attr_reader :name, :description, :pickup, :room_text
   attr_accessor :action
-  def initialize(name,description,action,pickup,visible)
+  def initialize(name,description,room_text,action,pickup,visible)
     @name = name
     @description = description
+    @room_text = room_text
     @action = action
     @pickup = pickup
   end
@@ -15,6 +16,7 @@ def create_objects
   $fork = GameObject.new(
     "Fork",
     "This is a fork",
+    "On the table, there is a fork.",
     {},
     true,
     true
@@ -22,6 +24,7 @@ def create_objects
   $bag = GameObject.new(
     "Bag",
     "This is a bag",
+    "There is a small bag on the floor.",
     {},
     false,
     true
@@ -29,6 +32,7 @@ def create_objects
   $balloon = GameObject.new(
     "Balloon",
     "This is an inflated balloon",
+    "A balloon is rolling on the floor.",
     {},
     true,
     true
@@ -36,6 +40,7 @@ def create_objects
   $punched_balloon = GameObject.new(
     "Punched balloon",
     "It's a deflated balloon with a tiny hole in it",
+    "",
     {},
     false,
     false
@@ -43,6 +48,7 @@ def create_objects
   $chest = GameObject.new(
     "Chest",
     "A big chest, with an almost even bigger padlock on it.",
+    "In the corner of the room is a big chest.",
     {},
     false,
     true
@@ -50,6 +56,7 @@ def create_objects
   $key = GameObject.new(
     "Key",
     "A key, to open stuff.",
+    "A small key lies on the floor.",
     {},
     true,
     true
