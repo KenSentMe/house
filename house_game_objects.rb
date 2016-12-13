@@ -61,6 +61,14 @@ def create_objects
     true,
     true
   )
+  $ball = GameObject.new(
+    "Ball",
+    "A ball.",
+    "",
+    {},
+    true,
+    false
+  )
 end
 
 # Because the action hash may contain objects that aren't initialized when the object instances are created, the actions are defined seperately.
@@ -83,8 +91,8 @@ def create_object_actions
   }
   $chest.action = {
     verb: "open",
-    state: "locked",
+    state: "closed",
     text: "The chest is locked.",
-    contains: [$ball, $typewriter]
+    contains: [$ball]
   }
 end

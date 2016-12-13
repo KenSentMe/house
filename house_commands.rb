@@ -107,7 +107,7 @@ module Commands
       $inventory.each do |s,i|
         inventory_list << i.name
       end
-      puts "In your inventory you has the following items: #{inventory_list.join(', ')}"
+      puts "In your inventory you have the following items: #{inventory_list.join(', ')}"
     end
   end
 
