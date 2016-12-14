@@ -122,7 +122,7 @@ module Commands
         direction_conversions = {n: "North", s: "South", e: "East", w: "West"}
         full_direction = direction_conversions[direction]
         room_name = $current_room.name
-        $reply_text = "You go #{full_direction} and enter #{room_name}"
+        $reply_text = "You go #{full_direction} and enter #{$current_room.name}"
       else
         $reply_text = "You can't go that way"
       end
