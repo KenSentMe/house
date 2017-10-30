@@ -1,7 +1,9 @@
 require 'telegram_bot'
 require "./house_game_objects.rb"
+require "./house_tasks.rb"
 require "./house_commands.rb"
 require "./house_rooms.rb"
+
 
 # Here the commands are evaluated and (if necessary) sent to the appropriate method
 def evaluate(command_word, command_params)
@@ -20,6 +22,8 @@ def evaluate(command_word, command_params)
     inventory
   when "use"
     use($current_room, command_params)
+  when "open"
+    open($current_room, command_params)
   else
     $reply_text = "I don't understand #{command_word}"
   end

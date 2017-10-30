@@ -1,4 +1,5 @@
 module Commands
+  include Tasks
 
   # The look method is for objects in a room or in your inventory
   def look(current_room, command_params)
@@ -18,7 +19,7 @@ module Commands
     else
       # look at an object in the room (if it exists)
       object = command_params.join('_').intern
-      if current_room.game_objects.key?(object)
+      if current_room.game_objects.key?(object) && current_room.game_objects[object].visible
         object_instance = current_room.game_objects[object]
         $reply_text =object_instance.description
       elsif $inventory.key?(object)
@@ -128,6 +129,25 @@ module Commands
     else
       wrong_direction = command_params.join(" ")
       $reply_text = "I don't understand the direction #{wrong_direction}"
+    end
+  end
+
+  def open(current_room, command_params)
+    if command_params.empty?
+      $reply_text = "Open what?"
+    else
+      object =  command_params[0].intern
+      if current_room.game_objects.key?(object)
+        object_instance = current_room.game_objects[object]
+        object_instance.action.each do |a|
+          if a[:verb] = "open"
+            job = a[:result]
+            run_job(job)
+          end
+        end
+      else
+        $reply_text = "You can't open that. At least not now."
+      end
     end
   end
 end

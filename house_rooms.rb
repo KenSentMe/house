@@ -14,7 +14,7 @@ end
 # because not all instances are available when they are called in the hashes
 
 def create_rooms
-  $room1 = Room.new("Room 1", "This is room 1", {}, {fork: $fork, bag: $bag, balloon: $balloon, key: $key, chest: $chest})
+  $room1 = Room.new("Room 1", "This is room 1", {}, {fork: $fork, bag: $bag, balloon: $balloon, key: $key, chest: $chest, ball: $ball})
   $room2 = Room.new("Room 2", "This is room 2", {}, {})
   $room3 = Room.new("Room 3", "This is room 3", {}, {})
   $room4 = Room.new("Room 4", "This is room 4", {}, {})

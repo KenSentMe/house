@@ -1,7 +1,7 @@
 # Create the object class for all objects in the game
 class GameObject
-  attr_reader :name, :description, :pickup, :room_text
-  attr_accessor :action
+  attr_reader :name, :pickup, :room_text
+  attr_accessor :action, :description, :visible
   def initialize(name,description,room_text,action,pickup,visible)
     @name = name
     @description = description
@@ -17,7 +17,7 @@ def create_objects
     "Fork",
     "This is a fork",
     "On the table, there is a fork.",
-    {},
+    [],
     true,
     true
   )
@@ -25,7 +25,7 @@ def create_objects
     "Bag",
     "This is a bag",
     "There is a small bag on the floor.",
-    {},
+    [],
     false,
     true
   )
@@ -33,7 +33,7 @@ def create_objects
     "Balloon",
     "This is an inflated balloon",
     "A balloon is rolling on the floor.",
-    {},
+    [],
     true,
     true
   )
@@ -41,7 +41,7 @@ def create_objects
     "Punched balloon",
     "It's a deflated balloon with a tiny hole in it",
     "",
-    {},
+    [],
     false,
     false
   )
@@ -49,7 +49,7 @@ def create_objects
     "Chest",
     "A big chest, with an almost even bigger padlock on it.",
     "In the corner of the room is a big chest.",
-    {},
+    [],
     false,
     true
   )
@@ -57,7 +57,7 @@ def create_objects
     "Key",
     "A key, to open stuff.",
     "A small key lies on the floor.",
-    {},
+    [],
     true,
     true
   )
@@ -65,13 +65,14 @@ def create_objects
     "Ball",
     "A ball.",
     "",
-    {},
+    [],
     true,
     false
   )
 end
 
-# Because the action hash may contain objects that aren't initialized when the object instances are created, the actions are defined seperately.
+# Because the action hash may contain objects that aren't initialized when
+# the object instances are created, the actions are defined seperately.
 def create_object_actions
   $fork.action = {
     verb: "use",
@@ -81,18 +82,29 @@ def create_object_actions
     created_objects: [$punched_balloon],
     deleted_objects: [:fork, :balloon]
   }
-  $key.action = {
-    verb: "alter",
-    combine_with: "chest",
-    text: "You use the key to open the chest.",
-    altered_object: $chest,
-    altered_description: "Since you've used the key to open the padlock, you can now open the chest.",
-    altered_text: "Inside the chest you find"
-  }
-  $chest.action = {
-    verb: "open",
-    state: "closed",
-    text: "The chest is locked.",
-    contains: [$ball]
-  }
+  # $key.action = {
+  #   verb: "alter",
+  #   combine_with: "chest",
+  #   text: "You use the key to open the chest.",
+  #   altered_object: $chest,
+  #   altered_description: "Since you've used the key to open the padlock, you can now open the chest.",
+  #   altered_text: "Inside the chest you find"
+  # }
+  $chest.action = [
+    {
+      verb: "open",
+      result: [
+        {
+          job: "alter_description",
+          affected_object: $chest,
+          altered_description: "The chest is now open."
+        },
+        {
+          job: "change_visibility",
+          affected_object: $ball,
+          visibility_state: true
+        }
+      ]
+    }
+  ]
 end
