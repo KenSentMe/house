@@ -1,13 +1,15 @@
 # Create the object class for all objects in the game
 class GameObject
-  attr_reader :name, :pickup, :room_text
-  attr_accessor :action, :description, :visible
-  def initialize(name,description,room_text,action,pickup,visible)
+  attr_reader :name, :room_text
+  attr_accessor :action, :description, :visible, :pickup, :locked
+  def initialize(name,description,room_text,action,pickup,visible,locked)
     @name = name
     @description = description
     @room_text = room_text
     @action = action
     @pickup = pickup
+    @visible = visible
+    @locked = locked
   end
 end
 
@@ -16,10 +18,11 @@ def create_objects
   $fork = GameObject.new(
     "Fork",
     "This is a fork",
-    "On the table, there is a fork.",
+    "In the chest is a fork.",
     [],
-    true,
-    true
+    false,
+    false,
+    false
   )
   $bag = GameObject.new(
     "Bag",
@@ -27,7 +30,8 @@ def create_objects
     "There is a small bag on the floor.",
     [],
     false,
-    true
+    true,
+    false
   )
   $balloon = GameObject.new(
     "Balloon",
@@ -35,13 +39,15 @@ def create_objects
     "A balloon is rolling on the floor.",
     [],
     true,
-    true
+    true,
+    false
   )
   $punched_balloon = GameObject.new(
     "Punched balloon",
     "It's a deflated balloon with a tiny hole in it",
     "",
     [],
+    false,
     false,
     false
   )
@@ -51,6 +57,7 @@ def create_objects
     "In the corner of the room is a big chest.",
     [],
     false,
+    true,
     true
   )
   $key = GameObject.new(
@@ -59,14 +66,16 @@ def create_objects
     "A small key lies on the floor.",
     [],
     true,
-    true
+    true,
+    false
   )
   $ball = GameObject.new(
     "Ball",
     "A ball.",
-    "",
+    "In the chest lies a small ball.",
     [],
-    true,
+    false,
+    false,
     false
   )
 end
@@ -75,21 +84,14 @@ end
 # the object instances are created, the actions are defined seperately.
 def create_object_actions
   $fork.action = {
-    verb: "use",
+    verb: "combine",
     use_with: "balloon",
     text: "Using the fork on the balloon does the obvious thing. You get a deflated balloon with a hole in it.",
     result: :punched_balloon,
     created_objects: [$punched_balloon],
     deleted_objects: [:fork, :balloon]
   }
-  # $key.action = {
-  #   verb: "alter",
-  #   combine_with: "chest",
-  #   text: "You use the key to open the chest.",
-  #   altered_object: $chest,
-  #   altered_description: "Since you've used the key to open the padlock, you can now open the chest.",
-  #   altered_text: "Inside the chest you find"
-  # }
+
   $chest.action = [
     {
       verb: "open",
@@ -103,8 +105,32 @@ def create_object_actions
           job: "change_visibility",
           affected_object: $ball,
           visibility_state: true
+        },
+        {
+          job: "change_pickup",
+          affected_object: $ball,
+          pickup_state: true
+        },
+        {
+          job: "change_visibility",
+          affected_object: $fork,
+          visibility_state: true
+        },
+        {
+          job: "change_pickup",
+          affected_object: $fork,
+          pickup_state: true
         }
       ]
     }
   ]
+  # $key.action = {
+  #   verb: "alter",
+  #   combine_with: "chest",
+  #   text: "You use the key to open the chest.",
+  #   altered_object: $chest,
+  #   altered_description: "Since you've used the key to open the padlock, you can now open the chest.",
+  #   altered_text: "Inside the chest you find"
+  # }
+
 end
